@@ -46,16 +46,13 @@ declare namespace Konva {
   export type Node = import('./Node').Node;
   export type NodeConfig = import('./Node').NodeConfig;
 
-  export type KonvaEventObject<
-    EventType
-  > = import('./Node').KonvaEventObject<EventType>;
+  export type KonvaEventObject<EventType> =
+    import('./Node').KonvaEventObject<EventType>;
 
   export type KonvaPointerEvent = import('./PointerEvents').KonvaPointerEvent;
 
-  export type KonvaEventListener<
-    This,
-    EventType
-  > = import('./Node').KonvaEventListener<This, EventType>;
+  export type KonvaEventListener<This, EventType> =
+    import('./Node').KonvaEventListener<This, EventType>;
 
   export const Container: typeof import('./Container').Container;
   export type Container = import('./Container').Container<Node>;
@@ -124,6 +121,11 @@ declare namespace Konva {
   export const Line: typeof import('./shapes/Line').Line;
   export type Line = import('./shapes/Line').Line;
   export type LineConfig = import('./shapes/Line').LineConfig;
+  export const MultiStyledText: typeof import('./shapes/MultiStyledText').MultiStyledText;
+  export type MultiStyledText =
+    import('./shapes/MultiStyledText').MultiStyledText;
+  export type MultiStyledTextConfig =
+    import('./shapes/MultiStyledText').MultiStyledTextConfig;
   export const Path: typeof import('./shapes/Path').Path;
   export type Path = import('./shapes/Path').Path;
   export type PathConfig = import('./shapes/Path').PathConfig;
@@ -132,7 +134,8 @@ declare namespace Konva {
   export type RectConfig = import('./shapes/Rect').RectConfig;
   export const RegularPolygon: typeof import('./shapes/RegularPolygon').RegularPolygon;
   export type RegularPolygon = import('./shapes/RegularPolygon').RegularPolygon;
-  export type RegularPolygonConfig = import('./shapes/RegularPolygon').RegularPolygonConfig;
+  export type RegularPolygonConfig =
+    import('./shapes/RegularPolygon').RegularPolygonConfig;
   export const Ring: typeof import('./shapes/Ring').Ring;
   export type Ring = import('./shapes/Ring').Ring;
   export type RingConfig = import('./shapes/Ring').RingConfig;
@@ -150,7 +153,8 @@ declare namespace Konva {
   export type TextPathConfig = import('./shapes/TextPath').TextPathConfig;
   export const Transformer: typeof import('./shapes/Transformer').Transformer;
   export type Transformer = import('./shapes/Transformer').Transformer;
-  export type TransformerConfig = import('./shapes/Transformer').TransformerConfig;
+  export type TransformerConfig =
+    import('./shapes/Transformer').TransformerConfig;
   export const Wedge: typeof import('./shapes/Wedge').Wedge;
   export type Wedge = import('./shapes/Wedge').Wedge;
   export type WedgeConfig = import('./shapes/Wedge').WedgeConfig;

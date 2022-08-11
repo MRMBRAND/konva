@@ -10,6 +10,7 @@ import { Ellipse } from './shapes/Ellipse';
 import { Image } from './shapes/Image';
 import { Label, Tag } from './shapes/Label';
 import { Line } from './shapes/Line';
+import { MultiStyledText } from './shapes/MultiStyledText';
 import { Path } from './shapes/Path';
 import { Rect } from './shapes/Rect';
 import { RegularPolygon } from './shapes/RegularPolygon';
@@ -51,6 +52,7 @@ export const Konva = Core.Util._assign(Core, {
   Label,
   Tag,
   Line,
+  MultiStyledText,
   Path,
   Rect,
   RegularPolygon,
