@@ -2,6 +2,7 @@ import { Context } from '../Context';
 import { Factory } from '../Factory';
 import { _registerNode } from '../Global';
 import { Shape, ShapeConfig } from '../Shape';
+import { TextConfig } from './Text';
 import { GetSet } from '../types';
 import { Util } from '../Util';
 import {
@@ -35,38 +36,53 @@ function normalizeFontFamily(fontFamily: string) {
     .join(', ');
 }
 
-export interface TextStyle {
-  start: number; // start position of the style
-  end?: number; // end position of the style, if undefined it means until the end
+interface FontProps {
   fontFamily: string;
   fontSize: number;
   fontStyle: 'normal' | 'italic' | 'bold' | 'italic bold' | 'bold italic';
   fontVariant: 'normal' | 'small-caps';
-  textDecoration: '' | 'underline' | 'line-through' | 'underline line-through';
+  textDecoration:
+    | ''
+    | 'underline'
+    | 'line-through'
+    | 'underline line-through'
+    | 'line-through underline';
+}
+
+export interface TextStyleRule extends FontProps {
+  start: number; // start position of the style
+  end?: number; // end position of the style, if undefined it means until the end
   fill: string;
   stroke: string;
 }
 
 type TextPart = {
   height: number;
-  style: Omit<TextStyle, 'start' | 'end'>;
+  style: Omit<TextStyleRule, 'start' | 'end'>;
   text: string;
   width: number;
   x: number;
   y: number;
 };
 
-export interface MultiStyledTextConfig extends ShapeConfig {
-  text?: string;
-  textStyles?: TextStyle[];
-  align?: string;
-  verticalAlign?: string;
-  padding?: number;
-  lineHeight?: number;
-  letterSpacing?: number;
-  wrap?: string;
-  ellipsis?: boolean;
+export interface MultiStyledTextConfig
+  extends Omit<TextConfig, keyof FontProps> {
+  textStyles?: TextStyleRule[];
 }
+
+const ATTR_CHANGE_LIST = [
+  'align',
+  'ellipsis',
+  'height',
+  'letterSpacing',
+  'lineHeight',
+  'padding',
+  'text',
+  'textStyles',
+  'verticalAlign',
+  'width',
+  'wrap',
+];
 
 export class MultiStyledText extends Shape<MultiStyledTextConfig> {
   public className = 'MultiStyledText';
@@ -77,7 +93,7 @@ export class MultiStyledText extends Shape<MultiStyledTextConfig> {
   public padding!: GetSet<number, this>;
   public lineHeight!: GetSet<number, this>;
   public text!: GetSet<string, this>;
-  public textStyles!: GetSet<TextStyle[], this>;
+  public textStyles!: GetSet<TextStyleRule[], this>;
   public wrap!: GetSet<'word' | 'char' | 'none', this>;
   public ellipsis!: GetSet<boolean, this>;
 
@@ -99,22 +115,13 @@ export class MultiStyledText extends Shape<MultiStyledTextConfig> {
   constructor(config?: MultiStyledTextConfig) {
     super(config);
     // update text data for certain attr changes
-    for (const attr of [
-      'padding',
-      'wrap',
-      'lineHeight',
-      'letterSpacing',
-      'textStyles',
-      'width',
-      'height',
-      'text',
-    ]) {
+    for (const attr of ATTR_CHANGE_LIST) {
       this.on(`${attr}Change.konva`, this.computeTextParts);
     }
     this.computeTextParts();
   }
 
-  private formatFont(part: Pick<TextPart, 'style'>) {
+  private _getPartContextFont(part: Pick<TextPart, 'style'>) {
     return `${part.style.fontStyle} ${part.style.fontVariant} ${
       part.style.fontSize
     }px ${normalizeFontFamily(part.style.fontFamily)}`;
@@ -123,7 +130,7 @@ export class MultiStyledText extends Shape<MultiStyledTextConfig> {
   private measurePart(part: Omit<TextPart, 'width' | 'height' | 'x' | 'y'>) {
     const context = getDummyContext();
     context.save();
-    context.font = this.formatFont(part);
+    context.font = this._getPartContextFont(part);
     const width = context.measureText(part.text).width;
     context.restore();
     return width;
@@ -474,7 +481,7 @@ export class MultiStyledText extends Shape<MultiStyledTextConfig> {
 
         this.fill(part.style.fill);
         this.stroke(part.style.stroke);
-        context.setAttr('font', this.formatFont(part));
+        context.setAttr('font', this._getPartContextFont(part));
 
         // text
         if (this.letterSpacing() !== 0 || this.align() === 'justify') {
@@ -560,6 +567,15 @@ export class MultiStyledText extends Shape<MultiStyledTextConfig> {
     return true;
   }
 }
+
+MultiStyledText.prototype._attrsAffectingSize = [
+  'text',
+  'textStyles',
+  'padding',
+  'wrap',
+  'lineHeight',
+];
+
 _registerNode(MultiStyledText);
 
 /**
@@ -734,13 +750,13 @@ Factory.addGetterSetter(MultiStyledText, 'text', '', getStringValidator());
  * get/set textStyles
  * @name Konva.Text#textStyles
  * @method
- * @param {TextStyle[]} textStyles
+ * @param {TextStyleRule[]} textStyles
  * @returns {String}
  * @example
  * // set styles
  * text.textStyles([{ start: 0, fontFamily: 'Roboto' }]);
  */
-const defaultStyle: TextStyle = {
+const defaultStyle: TextStyleRule = {
   start: 0,
   fill: 'black',
   stroke: 'black',

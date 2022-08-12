@@ -8,7 +8,7 @@
    * Konva JavaScript Framework v8.3.11
    * http://konvajs.org/
    * Licensed under the MIT
-   * Date: Thu Aug 11 2022
+   * Date: Fri Aug 12 2022
    *
    * Original work Copyright (C) 2011 - 2013 by Eric Rowell (KineticJS)
    * Modified work Copyright (C) 2014 - present by Anton Lavrenov (Konva)
@@ -11860,7 +11860,7 @@
    */
 
   // constants
-  var ATTR_CHANGE_LIST$2 = [
+  var ATTR_CHANGE_LIST$3 = [
       'fontFamily',
       'fontSize',
       'fontStyle',
@@ -11874,7 +11874,7 @@
       'pointerHeight',
   ], CHANGE_KONVA$1 = 'Change.konva', NONE$1 = 'none', UP = 'up', RIGHT$1 = 'right', DOWN = 'down', LEFT$1 = 'left', 
   // cached variables
-  attrChangeListLen$1 = ATTR_CHANGE_LIST$2.length;
+  attrChangeListLen$1 = ATTR_CHANGE_LIST$3.length;
   /**
    * Label constructor.&nbsp; Labels are groups that contain a Text and Tag shape
    * @constructor
@@ -11967,7 +11967,7 @@
           };
           // update text data for certain attr changes
           for (n = 0; n < attrChangeListLen$1; n++) {
-              text.on(ATTR_CHANGE_LIST$2[n] + CHANGE_KONVA$1, func);
+              text.on(ATTR_CHANGE_LIST$3[n] + CHANGE_KONVA$1, func);
           }
       }
       getWidth() {
@@ -12178,6 +12178,19 @@
       })
           .join(', ');
   }
+  const ATTR_CHANGE_LIST$2 = [
+      'align',
+      'ellipsis',
+      'height',
+      'letterSpacing',
+      'lineHeight',
+      'padding',
+      'text',
+      'textStyles',
+      'verticalAlign',
+      'width',
+      'wrap',
+  ];
   class MultiStyledText extends Shape {
       constructor(config) {
           super(config);
@@ -12198,27 +12211,18 @@
               context.strokeText(this.drawState.text, this.drawState.x, this.drawState.y, undefined);
           };
           // update text data for certain attr changes
-          for (const attr of [
-              'padding',
-              'wrap',
-              'lineHeight',
-              'letterSpacing',
-              'textStyles',
-              'width',
-              'height',
-              'text',
-          ]) {
+          for (const attr of ATTR_CHANGE_LIST$2) {
               this.on(`${attr}Change.konva`, this.computeTextParts);
           }
           this.computeTextParts();
       }
-      formatFont(part) {
+      _getPartContextFont(part) {
           return `${part.style.fontStyle} ${part.style.fontVariant} ${part.style.fontSize}px ${normalizeFontFamily$1(part.style.fontFamily)}`;
       }
       measurePart(part) {
           const context = getDummyContext$1();
           context.save();
-          context.font = this.formatFont(part);
+          context.font = this._getPartContextFont(part);
           const width = context.measureText(part.text).width;
           context.restore();
           return width;
@@ -12504,7 +12508,7 @@
                   }
                   this.fill(part.style.fill);
                   this.stroke(part.style.stroke);
-                  context.setAttr('font', this.formatFont(part));
+                  context.setAttr('font', this._getPartContextFont(part));
                   // text
                   if (this.letterSpacing() !== 0 || this.align() === 'justify') {
                       const spacesNumber = part.text.split(' ').length - 1;
@@ -12564,6 +12568,13 @@
           return true;
       }
   }
+  MultiStyledText.prototype._attrsAffectingSize = [
+      'text',
+      'textStyles',
+      'padding',
+      'wrap',
+      'lineHeight',
+  ];
   _registerNode(MultiStyledText);
   /**
    * get/set width of text area, which includes padding.
@@ -12717,7 +12728,7 @@
    * get/set textStyles
    * @name Konva.Text#textStyles
    * @method
-   * @param {TextStyle[]} textStyles
+   * @param {TextStyleRule[]} textStyles
    * @returns {String}
    * @example
    * // set styles
